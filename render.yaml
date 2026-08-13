@@ -1,0 +1,19 @@
+# render.yaml — deploy automático no Render.com direto do GitHub.
+# No painel do Render: New > Blueprint > selecione este repositório.
+# O Render lê este arquivo e cria o serviço automaticamente.
+services:
+  - type: web
+    name: curva-seguranca
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false   # cole aqui a connection string do seu cluster MongoDB Atlas
+      - key: MONGODB_DB
+        value: curva_seguranca
+      - key: NODE_VERSION
+        value: 20.11.0
+    healthCheckPath: /api/health

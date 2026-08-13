@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta | Curva de Segurança</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/vendor/chart.umd.js"></script>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brandmark"><span class="dot"></span> CURVA&nbsp;SEG.</div>
+
+    <div class="nav-item active" data-target="page-painel">Painel Geral</div>
+    <div class="nav-item" data-target="page-setores">Setores</div>
+
+    <div class="sidebar-footer">
+      <div class="mode-chip">
+        <div class="avatar">C</div>
+        <div class="info">
+          <div class="name">Painel de consulta</div>
+          <div class="role">Somente leitura</div>
+        </div>
+      </div>
+      <div class="refresh-indicator"><span class="dot"></span> Atualiza automaticamente</div>
+      <a class="cross-link" href="admin.html">↔ Acessar painel administrativo</a>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+
+    <div id="bannerConexao" class="banner-erro hidden"></div>
+
+    <!-- ---------- PÁGINA: PAINEL GERAL ---------- -->
+    <section class="page-section active" id="page-painel">
+      <div class="topbar">
+        <div>
+          <h1>Painel Geral da Curva de Segurança</h1>
+          <div class="subtitle">Visão consolidada de toda a empresa, em tempo real.</div>
+        </div>
+        <button class="btn ghost" id="btnAtualizarAgora">↻ Atualizar agora</button>
+      </div>
+
+      <div class="cards-row" id="cardsRow"></div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Curva de segurança geral</h2>
+            <div class="panel-sub">Índice diário calculado a partir de todos os eventos da empresa.</div>
+          </div>
+          <div class="range-toggle" id="rangeToggleGeral">
+            <button data-dias="30">30d</button>
+            <button data-dias="90">90d</button>
+            <button data-dias="180" class="active">180d</button>
+            <button data-dias="365">365d</button>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="curveChartGeral"></canvas></div>
+        <div class="chart-legend">
+          <div class="item"><span class="swatch" style="background:#e4483d"></span> Crítico</div>
+          <div class="item"><span class="swatch" style="background:#f2994a"></span> Moderado</div>
+          <div class="item"><span class="swatch" style="background:#2fb0a8"></span> Normal</div>
+          <div class="item"><span class="swatch" style="background:#3dbe6c"></span> Melhorado</div>
+          <div class="item min-line"><span class="swatch"></span> Mínimo aceitável</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel" style="margin-bottom:0">
+          <div class="panel-head">
+            <div><h2>Últimos eventos</h2><div class="panel-sub">Registros recentes de todos os setores.</div></div>
+          </div>
+          <div class="table-wrap">
+            <table class="events-table" id="tabelaRecentes">
+              <thead><tr><th>Data</th><th>Evento</th><th>Setor</th><th>Tipo</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-head"><h2 style="font-size:16px">Mínimo aceitável</h2></div>
+            <div class="min-standard">
+              <div class="row"><span class="label">Diretriz mínima da empresa</span><span class="value" id="minAceitavelValor">—</span></div>
+              <p>Piso definido para o índice de segurança geral. Abaixo dele, a operação não atende ao padrão mínimo.</p>
+            </div>
+            <div class="min-standard" style="margin-bottom:0">
+              <div class="row"><span class="label">Nível atual</span><span class="badge normal" id="nivelAtualBadge">—</span></div>
+              <p id="statusMinimoTexto">Calculando...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PÁGINA: SETORES ---------- -->
+    <section class="page-section" id="page-setores">
+      <div class="topbar">
+        <div>
+          <h1>Setores</h1>
+          <div class="subtitle">Evolução da curva de segurança de cada setor da empresa, individualmente.</div>
+        </div>
+      </div>
+
+      <div class="sectors-grid" id="sectorsGrid"></div>
+
+      <div class="panel" id="sectorDetailPanel" style="display:none;">
+        <div class="sector-detail-head">
+          <div>
+            <h2 id="sectorDetailName">—</h2>
+            <div class="sc-desc-full" id="sectorDetailDesc"></div>
+          </div>
+          <div class="range-toggle" id="rangeToggleSetor">
+            <button data-dias="30">30d</button>
+            <button data-dias="90" class="active">90d</button>
+            <button data-dias="180">180d</button>
+            <button data-dias="365">365d</button>
+          </div>
+        </div>
+        <div class="chart-wrap" style="margin-top:14px;"><canvas id="curveChartSetor"></canvas></div>
+        <div class="chart-legend">
+          <div class="item"><span class="swatch" style="background:#e4483d"></span> Crítico</div>
+          <div class="item"><span class="swatch" style="background:#f2994a"></span> Moderado</div>
+          <div class="item"><span class="swatch" style="background:#2fb0a8"></span> Normal</div>
+          <div class="item"><span class="swatch" style="background:#3dbe6c"></span> Melhorado</div>
+          <div class="item min-line"><span class="swatch"></span> Mínimo aceitável</div>
+        </div>
+
+        <div class="panel-head" style="margin-top:24px;">
+          <div><h2 style="font-size:16px">Eventos deste setor</h2></div>
+        </div>
+        <div class="table-wrap">
+          <table class="events-table" id="tabelaSetorEventos">
+            <thead><tr><th>Data</th><th>Evento</th><th>Tipo</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="pick-a-sector" id="pickASector">Clique em um setor acima para ver a evolução da curva dele.</div>
+    </section>
+
+  </main>
+</div>
+
+<div id="toastArea"></div>
+
+<script src="js/api.js"></script>
+<script src="js/curve-render.js"></script>
+<script src="js/consulta.js"></script>
+</body>
+</html>

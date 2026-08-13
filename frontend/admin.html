@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Administrativo | Curva de Segurança</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/vendor/chart.umd.js"></script>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brandmark"><span class="dot"></span> CURVA&nbsp;SEG.</div>
+
+    <div class="nav-item active" data-target="page-painel">Painel Geral</div>
+    <div class="nav-item" data-target="page-eventos">Eventos</div>
+    <div class="nav-item" data-target="page-setores">Setores</div>
+    <div class="nav-item" data-target="page-diretrizes">Diretrizes &amp; Pesos</div>
+
+    <div class="sidebar-footer">
+      <div class="mode-chip">
+        <div class="avatar">A</div>
+        <div class="info">
+          <div class="name">Painel administrativo</div>
+          <div class="role">Edição habilitada</div>
+        </div>
+      </div>
+      <a class="cross-link" href="index.html">↔ Ver versão de consulta</a>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+
+    <div id="bannerConexao" class="banner-erro hidden"></div>
+
+    <!-- ---------- PÁGINA: PAINEL GERAL ---------- -->
+    <section class="page-section active" id="page-painel">
+      <div class="topbar">
+        <div>
+          <h1>Painel Geral da Curva de Segurança</h1>
+          <div class="subtitle">Visão consolidada de toda a empresa — não é afetada pelos filtros de setor.</div>
+        </div>
+        <button class="btn primary" id="btnNovoEvento">+ Registrar evento</button>
+      </div>
+
+      <div class="cards-row" id="cardsRow"></div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Curva de segurança geral</h2>
+            <div class="panel-sub">Índice diário calculado a partir de todos os eventos da empresa.</div>
+          </div>
+          <div class="range-toggle" id="rangeToggleGeral">
+            <button data-dias="30">30d</button>
+            <button data-dias="90">90d</button>
+            <button data-dias="180" class="active">180d</button>
+            <button data-dias="365">365d</button>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="curveChartGeral"></canvas></div>
+        <div class="chart-legend">
+          <div class="item"><span class="swatch" style="background:#e4483d"></span> Crítico</div>
+          <div class="item"><span class="swatch" style="background:#f2994a"></span> Moderado</div>
+          <div class="item"><span class="swatch" style="background:#2fb0a8"></span> Normal</div>
+          <div class="item"><span class="swatch" style="background:#3dbe6c"></span> Melhorado</div>
+          <div class="item min-line"><span class="swatch"></span> Mínimo aceitável</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel" style="margin-bottom:0">
+          <div class="panel-head">
+            <div><h2>Últimos eventos</h2><div class="panel-sub">Registros recentes de todos os setores.</div></div>
+          </div>
+          <div class="table-wrap">
+            <table class="events-table" id="tabelaRecentes">
+              <thead><tr><th>Data</th><th>Evento</th><th>Setor</th><th>Tipo</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="panel">
+            <div class="panel-head"><h2 style="font-size:16px">Mínimo aceitável</h2></div>
+            <div class="min-standard">
+              <div class="row"><span class="label">Diretriz mínima da empresa</span><span class="value" id="minAceitavelValor">—</span></div>
+              <p>Piso definido para o índice de segurança geral. Abaixo dele, a operação não atende ao padrão mínimo e exige plano de ação.</p>
+            </div>
+            <div class="min-standard" style="margin-bottom:0">
+              <div class="row"><span class="label">Nível atual</span><span class="badge normal" id="nivelAtualBadge">—</span></div>
+              <p id="statusMinimoTexto">Calculando...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PÁGINA: EVENTOS ---------- -->
+    <section class="page-section" id="page-eventos">
+      <div class="topbar">
+        <div>
+          <h1>Eventos registrados</h1>
+          <div class="subtitle">Documentos, acidentes, incidentes, notificações, irregularidades, treinamentos e auditorias.</div>
+        </div>
+        <button class="btn primary" id="btnNovoEvento2">+ Registrar evento</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><div><h2>Filtrar</h2></div></div>
+        <div class="field-row" style="margin-bottom:8px; flex-wrap:wrap;">
+          <div class="field" style="max-width:220px;">
+            <label>Tipo de evento</label>
+            <select id="filtroTipo"><option value="">Todos</option></select>
+          </div>
+          <div class="field" style="max-width:200px;">
+            <label>Setor</label>
+            <select id="filtroSetor"><option value="">Todos</option></select>
+          </div>
+          <div class="field" style="max-width:170px;"><label>De</label><input type="date" id="filtroDe"></div>
+          <div class="field" style="max-width:170px;"><label>Até</label><input type="date" id="filtroAte"></div>
+          <div class="field" style="justify-content:flex-end;"><label>&nbsp;</label><button class="btn" id="btnLimparFiltro">Limpar filtros</button></div>
+        </div>
+        <div class="table-wrap">
+          <table class="events-table" id="tabelaCompleta">
+            <thead><tr><th>Data</th><th>Evento</th><th>Setor</th><th>Tipo</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- PÁGINA: SETORES ---------- -->
+    <section class="page-section" id="page-setores">
+      <div class="topbar">
+        <div>
+          <h1>Setores</h1>
+          <div class="subtitle">Cadastre setores manualmente e acompanhe a evolução da curva de cada um, isoladamente do painel geral.</div>
+        </div>
+      </div>
+
+      <form class="add-sector-form" id="formNovoSetor">
+        <div class="field">
+          <label>Nome do novo setor</label>
+          <input type="text" id="setorNome" placeholder="ex: Expedição" required>
+        </div>
+        <div class="field">
+          <label>Descrição (opcional)</label>
+          <input type="text" id="setorDescricao" placeholder="ex: Área de carregamento de caminhões">
+        </div>
+        <button type="submit" class="btn primary">+ Adicionar setor</button>
+      </form>
+
+      <div class="sectors-grid" id="sectorsGrid"></div>
+
+      <div class="panel" id="sectorDetailPanel" style="display:none;">
+        <div class="sector-detail-head">
+          <div>
+            <h2 id="sectorDetailName">—</h2>
+            <div class="sc-desc-full" id="sectorDetailDesc"></div>
+          </div>
+          <div class="range-toggle" id="rangeToggleSetor">
+            <button data-dias="30">30d</button>
+            <button data-dias="90" class="active">90d</button>
+            <button data-dias="180">180d</button>
+            <button data-dias="365">365d</button>
+          </div>
+        </div>
+        <div class="chart-wrap" style="margin-top:14px;"><canvas id="curveChartSetor"></canvas></div>
+        <div class="chart-legend">
+          <div class="item"><span class="swatch" style="background:#e4483d"></span> Crítico</div>
+          <div class="item"><span class="swatch" style="background:#f2994a"></span> Moderado</div>
+          <div class="item"><span class="swatch" style="background:#2fb0a8"></span> Normal</div>
+          <div class="item"><span class="swatch" style="background:#3dbe6c"></span> Melhorado</div>
+          <div class="item min-line"><span class="swatch"></span> Mínimo aceitável</div>
+        </div>
+
+        <div class="panel-head" style="margin-top:24px;">
+          <div><h2 style="font-size:16px">Eventos deste setor</h2></div>
+        </div>
+        <div class="table-wrap">
+          <table class="events-table" id="tabelaSetorEventos">
+            <thead><tr><th>Data</th><th>Evento</th><th>Tipo</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="pick-a-sector" id="pickASector">Cadastre um setor acima ou clique em um card para ver a evolução da curva daquele setor.</div>
+    </section>
+
+    <!-- ---------- PÁGINA: DIRETRIZES & PESOS ---------- -->
+    <section class="page-section" id="page-diretrizes">
+      <div class="topbar">
+        <div>
+          <h1>Diretrizes da curva</h1>
+          <div class="subtitle">Defina o mínimo aceitável, a linha de base e o peso de cada tipo de evento no cálculo — vale para o painel geral e para todos os setores.</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel" style="margin-bottom:0">
+          <div class="panel-head"><h2>Peso de cada tipo de evento</h2></div>
+          <div class="helper-text">Valores positivos elevam a curva; negativos reduzem. Acidentes têm o maior peso negativo por padrão.</div>
+          <div class="weights-grid" id="weightsGrid"></div>
+        </div>
+        <div class="panel" style="margin-bottom:0">
+          <div class="panel-head"><h2>Parâmetros gerais</h2></div>
+          <div class="field"><label>Mínimo aceitável (0–100)</label><input type="number" id="cfgMinimo" min="0" max="100"></div>
+          <div class="field"><label>Linha de base (baseline)</label><input type="number" id="cfgBaseline" min="0" max="100"></div>
+          <div class="field"><label>Recuperação/decaimento por dia</label><input type="number" id="cfgRecovery" step="0.05" min="0" max="10"></div>
+          <div class="helper-text">Quanto a curva se move por dia, sem novos eventos, em direção à linha de base.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px; display:flex; justify-content:flex-end;">
+        <button class="btn primary" id="btnSalvarConfig">Salvar diretrizes</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================== MODAL: NOVO EVENTO ===================== -->
+<div class="modal-overlay hidden" id="modalEvento">
+  <div class="modal">
+    <h3>Registrar evento</h3>
+    <div class="modal-sub">Esse registro entra tanto na curva geral quanto na curva do setor selecionado.</div>
+    <form id="formEvento">
+      <div class="field">
+        <label>Tipo de evento</label>
+        <select id="evTipo" required></select>
+      </div>
+      <div class="field">
+        <label>Título / descrição breve</label>
+        <input type="text" id="evTitulo" placeholder="ex: Extintor vencido identificado" required>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Setor</label>
+          <select id="evSetor" required></select>
+        </div>
+        <div class="field">
+          <label>Data</label>
+          <input type="date" id="evData" required>
+        </div>
+      </div>
+      <div id="novoSetorInline" class="hidden" style="margin:-6px 0 14px; padding:12px; background:var(--bg-elevated); border:1px dashed var(--border); border-radius:8px;">
+        <div class="field" style="margin-bottom:8px;">
+          <label>Nome do novo setor</label>
+          <input type="text" id="evNovoSetorNome" placeholder="ex: Expedição">
+        </div>
+        <button type="button" class="btn" id="btnCriarSetorInline" style="width:100%;">Criar e usar este setor</button>
+      </div>
+      <div class="field" style="margin-top:-6px;">
+        <a href="#" id="linkAddSetorInline" style="font-size:12px; color:var(--text-faint);">+ cadastrar um novo setor agora</a>
+      </div>
+      <div class="field">
+        <label>Observação (opcional)</label>
+        <textarea id="evObs" rows="3"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" id="btnCancelarEvento">Cancelar</button>
+        <button type="submit" class="btn primary">Salvar evento</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toastArea"></div>
+
+<script src="js/api.js"></script>
+<script src="js/curve-render.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
